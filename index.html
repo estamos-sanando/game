@@ -375,7 +375,10 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
 'use strict';
 
 /* ============================================================
-   GAME CONTENT — 5 Capítulos de Decisiones Históric  {
+   GAME CONTENT — 5 Capítulos de Decisiones Históricas
+   ============================================================ */
+const CHAPTERS = [
+  {
     id: 1,
     year: 1946,
     yearLabel: "1946",
@@ -409,7 +412,8 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
       {icon:"📋", value:"0", label:"Estudios ecológicos previos"},
       {icon:"📅", value:"1946", label:"Año de la decisión"}
     ]
-  },:  {
+  },
+  {
     id: 2,
     year: 1965,
     yearLabel: "1960s",
@@ -442,10 +446,6 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
       {icon:"🦸", value:"Miles", label:"De castores para los años '70"},
       {icon:"🌲", value:"Creciente", label:"Daño al bosque nativo"},
       {icon:"⏰", value:"Décadas", label:"De acción insuficiente"}
-    ]
-  },bel:"Castores para 1975"},
-      {icon:"🌲", value:"30.000", label:"Hectáreas afectadas"},
-      {icon:"⏰", value:"20 años", label:"De inacción"}
     ]
   },
   {
@@ -512,7 +512,13 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
     realTitle: "Lo que realmente ocurrió",
     realText: "Argentina y Chile actuaron por separado durante años. Sin coordinación, los esfuerzos fueron ineficientes. Chile tardó en reconocer la magnitud del problema y en crear una legislación específica para tratar la especie como invasora.",
     realFact: "Hoy se estima que hay más de 20.000 castores en territorio chileno, principalmente en la Región de Magallanes.",
-      {
+    stats: [
+      {icon:"📋", value:"2008", label:"Año del acuerdo binacional"},
+      {icon:"🦫", value:"+20.000", label:"Castores en Chile"},
+      {icon:"🌊", value:"Canal Beagle", label:"Frontera cruzada"}
+    ]
+  },
+  {
     id: 5,
     year: 2008,
     yearLabel: "2008",
@@ -542,15 +548,9 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
     realText: "Argentina y Chile han impulsado programas de control y monitoreo. Sin embargo, la magnitud del problema representa un desafío a largo plazo. La recuperación de los bosques afectados puede requerir varias décadas debido al lento crecimiento de las especies nativas.",
     realFact: "El caso demuestra cómo la introducción de una especie fuera de su hábitat puede generar consecuencias inesperadas y refuerza la importancia de evaluar riesgos ambientales antes de actuar.",
     stats: [
-      {icon:"🌱", label:"Decenas de miles", value:"Castores estimados hoy"},
+      {icon:"🌱", value:"~70.000", label:"Castores estimados hoy"},
       {icon:"🌲", value:"Décadas", label:"Para recuperar el bosque"},
       {icon:"📢", value:"Hoy", label:"Aún sin solución completa"}
-    ]
-  } ser eliminada completamente, no solo controlada.",
-    stats: [
-      {icon:"📋", value:"2008", label:"Año del acuerdo"},
-      {icon:"💰", value:"8%", label:"Del presupuesto necesario"},
-      {icon:"🦫", value:"~70.000", label:"Castores en 2026"}
     ]
   }
 ];
