@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CASTORES — El costo de una decisión | Newsgame</title>
+<meta name="description" content="Un juego de decisiones sobre cómo Argentina introdujo 25 castores en 1946 y transformó el ecosistema de Tierra del Fuego para siempre."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+/* ======================================================
+   BASE
+   ====================================================== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#080E08;
+  --dark:#0D1B0D;
+  --panel:rgba(8,14,8,.88);
+  --panel2:rgba(8,14,8,.96);
+  --gold:#C9A227;
+  --gold-l:#E8C84A;
+  --gold-d:#8B6F10;
+  --cream:#F5ECD7;
+  --cream-m:#C8B99A;
+  --cream-d:#8A7860;
+  --green:#2E7D32;
+  --green-l:#66BB6A;
+  --red:#8B1A1A;
+  --red-l:#EF5350;
+  --blue:#0D3B6E;
+  --r:12px;
+  --ff-title:'Playfair Display',Georgia,serif;
+  --ff-body:'Source Serif 4',Georgia,serif;
+  --ff-ui:'Atkinson Hyperlegible',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream);
+  font-family:var(--ff-body);-webkit-font-smoothing:antialiased}
+
+/* ======================================================
+   SCENES — rendered on canvas, positioned absolute
+   ====================================================== */
+#scene-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;transition:opacity .8s ease}
+
+/* ======================================================
+   SCREEN SYSTEM
+   ====================================================== */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  pointer-events:none;opacity:0;transform:translateX(40px);
+  transition:opacity .55s ease,transform .55s ease}
+.screen.active{pointer-events:all;opacity:1;transform:none}
+.screen.exit{opacity:0;transform:translateX(-40px)}
+
+/* ======================================================
+   TITLE SCREEN
+   ====================================================== */
+#screen-title{align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(180deg,rgba(8,14,8,.3) 0%,rgba(8,14,8,.75) 60%,rgba(8,14,8,.97) 100%)}
+.title-eyebrow{font-family:var(--ff-ui);font-size:.75rem;letter-spacing:.35em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:12px;
+  display:flex;align-items:center;gap:10px}
+.title-eyebrow::before,.title-eyebrow::after{content:'';flex:1;max-width:40px;
+  height:1px;background:var(--gold);opacity:.5}
+.title-main{font-family:var(--ff-title);font-size:clamp(2.8rem,7vw,5.5rem);
+  font-weight:900;line-height:.9;margin-bottom:8px;letter-spacing:-.01em;
+  background:linear-gradient(160deg,var(--gold-l),var(--gold),var(--gold-d));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.title-sub{font-family:var(--ff-title);font-size:clamp(.85rem,2vw,1.15rem);
+  color:var(--cream-m);font-style:italic;letter-spacing:.04em;margin-bottom:28px}
+.title-divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:0 auto 28px}
+.title-desc{max-width:500px;font-size:clamp(.9rem,1.5vw,1.05rem);line-height:1.7;
+  color:var(--cream-m);margin:0 auto 36px;font-style:italic}
+.title-start{display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(145deg,var(--gold),var(--gold-d));
+  color:var(--black);padding:16px 38px;border-radius:50px;border:none;cursor:pointer;
+  font-family:var(--ff-ui);font-size:1rem;font-weight:700;letter-spacing:.04em;
+  box-shadow:0 6px 32px rgba(201,162,39,.4),0 2px 8px rgba(0,0,0,.4);
+  transition:transform .15s,box-shadow .15s;text-transform:uppercase}
+.title-start:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(201,162,39,.55)}
+.title-start:active{transform:translateY(1px)}
+.title-badge{background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.3);
+  border-radius:50px;padding:6px 18px;font-family:var(--ff-ui);font-size:.72rem;
+  color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-top:20px;
+  display:inline-block}
+
+/* ======================================================
+   PROGRESS BAR (top of screen during chapters)
+   ====================================================== */
+#progress-bar{position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--panel2);border-bottom:1px solid rgba(201,162,39,.2);
+  padding:12px 24px;display:flex;align-items:center;gap:16px;
+  transform:translateY(-100%);transition:transform .5s ease}
+#progress-bar.visible{transform:none}
+.prog-title{font-family:var(--ff-ui);font-size:.72rem;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.prog-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold),var(--gold-l));
+  border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1);width:0%}
+.prog-steps{display:flex;gap:0;align-items:center}
+.prog-step{display:flex;flex-direction:column;align-items:center;position:relative;
+  padding:0 14px;cursor:default}
+.prog-step:not(:last-child)::after{content:'';position:absolute;right:0;top:50%;
+  transform:translateY(-50%);width:1px;height:18px;background:rgba(255,255,255,.1)}
+.prog-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);
+  border:2px solid rgba(255,255,255,.1);margin-bottom:3px;transition:all .5s}
+.prog-dot.done{background:var(--gold-d);border-color:var(--gold)}
+.prog-dot.active{background:var(--gold);border-color:var(--gold-l);
+  box-shadow:0 0 8px var(--gold);transform:scale(1.3)}
+.prog-year{font-family:var(--ff-ui);font-size:.58rem;color:var(--cream-d);
+  white-space:nowrap}
+
+/* ======================================================
+   CHAPTER SCREENS
+   ====================================================== */
+.ch-screen{justify-content:flex-end;
+  background:linear-gradient(180deg,rgba(8,14,8,.05) 0%,rgba(8,14,8,.5) 50%,rgba(8,14,8,.97) 100%)}
+.ch-badge{position:absolute;top:68px;left:24px;
+  background:rgba(8,14,8,.75);border:1px solid rgba(201,162,39,.35);
+  border-radius:50px;padding:6px 18px;
+  display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px)}
+.ch-badge-year{font-family:var(--ff-title);font-size:1.3rem;font-weight:700;color:var(--gold)}
+.ch-badge-ch{font-family:var(--ff-ui);font-size:.65rem;color:var(--cream-d);
+  text-transform:uppercase;letter-spacing:.08em}
+.ch-panel{padding:20px 24px 28px;max-height:68vh;overflow-y:auto}
+.ch-title{font-family:var(--ff-title);font-size:clamp(1.4rem,3.5vw,2rem);
+  font-weight:900;color:var(--cream);line-height:1.15;margin-bottom:10px}
+.ch-narrative{font-size:clamp(.88rem,1.5vw,1rem);line-height:1.7;color:var(--cream-m);
+  margin-bottom:20px;font-style:italic;max-width:780px}
+.ch-question{font-family:var(--ff-ui);font-size:.78rem;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px}
+.ch-question::before{content:'';display:block;width:24px;height:1px;background:var(--gold);opacity:.5}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;max-width:900px}
+.choice-btn{background:rgba(20,35,20,.75);border:1px solid rgba(201,162,39,.25);
+  border-radius:var(--r);padding:16px 20px;cursor:pointer;text-align:left;
+  transition:all .2s;backdrop-filter:blur(4px);display:flex;align-items:flex-start;gap:12px;
+  color:var(--cream);font-family:var(--ff-body)}
+.choice-btn:hover{background:rgba(30,55,30,.85);border-color:var(--gold);
+  transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.choice-btn:active{transform:translateY(0)}
+.choice-btn.selected{border-color:var(--gold);background:rgba(201,162,39,.15)}
+.choice-btn.real{border-color:var(--red-l);background:rgba(139,26,26,.2)}
+.choice-btn.expert{border-color:var(--green-l);background:rgba(46,125,50,.2)}
+.choice-letter{width:32px;height:32px;border-radius:50%;border:2px solid rgba(201,162,39,.4);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:var(--ff-title);font-size:.9rem;font-weight:700;color:var(--gold)}
+.choice-text{font-size:.9rem;line-height:1.45;padding-top:4px}
+
+/* ======================================================
+   RESULT SCREENS
+   ====================================================== */
+.result-screen{justify-content:flex-end;
+  background:linear-gradient(180deg,rgba(8,14,8,.2) 0%,rgba(8,14,8,.6) 40%,rgba(8,14,8,.98) 100%)}
+.result-panel{padding:20px 24px 28px;max-height:72vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.result-your{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);
+  border-radius:var(--r);padding:14px 18px}
+.result-your-label{font-family:var(--ff-ui);font-size:.65rem;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.result-your-text{font-size:.9rem;color:var(--cream-m);line-height:1.5}
+.result-your-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+  font-family:var(--ff-ui);font-size:.68rem;padding:4px 12px;border-radius:50px}
+.badge-good{background:rgba(46,125,50,.3);color:#81C784;border:1px solid rgba(102,187,106,.4)}
+.badge-real{background:rgba(139,26,26,.3);color:#EF9A9A;border:1px solid rgba(239,83,80,.35)}
+.badge-neutral{background:rgba(201,162,39,.2);color:var(--gold);border:1px solid rgba(201,162,39,.3)}
+.result-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.4),transparent)}
+.result-real{border:1px solid rgba(239,83,80,.25);border-radius:var(--r);padding:14px 18px;
+  background:rgba(13,14,8,.6)}
+.result-real-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.result-real-icon{font-size:1rem}
+.result-real-label{font-family:var(--ff-ui);font-size:.68rem;color:var(--cream-d);
+  text-transform:uppercase;letter-spacing:.08em}
+.result-real-title{font-family:var(--ff-title);font-size:1.05rem;color:var(--cream);margin-bottom:8px;font-weight:700}
+.result-real-text{font-size:.88rem;color:var(--cream-m);line-height:1.65}
+.result-fact{background:rgba(201,162,39,.08);border-left:3px solid var(--gold);
+  padding:10px 14px;font-size:.82rem;color:var(--cream-d);font-style:italic;
+  border-radius:0 6px 6px 0;margin-top:8px}
+.result-stats{display:flex;gap:12px;flex-wrap:wrap}
+.result-stat{background:rgba(20,35,20,.6);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:10px 14px;flex:1;min-width:110px;text-align:center}
+.rs-icon{font-size:1.2rem;margin-bottom:2px}
+.rs-value{font-family:var(--ff-title);font-size:1.4rem;color:var(--gold);font-weight:700;line-height:1}
+.rs-label{font-size:.62rem;color:var(--cream-d);font-family:var(--ff-ui);
+  text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.result-next{display:flex;justify-content:flex-end;margin-top:4px}
+.btn-next{display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(145deg,var(--gold),var(--gold-d));
+  color:var(--black);padding:13px 28px;border-radius:50px;border:none;cursor:pointer;
+  font-family:var(--ff-ui);font-size:.88rem;font-weight:700;letter-spacing:.04em;
+  box-shadow:0 4px 20px rgba(201,162,39,.35);transition:all .2s;text-transform:uppercase}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,162,39,.45)}
+
+/* ======================================================
+   EPILOGUE
+   ====================================================== */
+#screen-epilogue{background:rgba(8,14,8,.92);justify-content:center;align-items:center;padding:20px}
+.epi-inner{max-width:760px;width:100%;text-align:center;max-height:calc(100vh - 90px);overflow-y:auto}
+.epi-title{font-family:var(--ff-title);font-size:clamp(1.6rem,4vw,2.6rem);font-weight:900;
+  color:var(--gold);margin-bottom:6px}
+.epi-sub{font-size:.9rem;color:var(--cream-d);font-style:italic;margin-bottom:24px}
+.epi-score-ring{width:120px;height:120px;border-radius:50%;border:4px solid var(--gold);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  margin:0 auto 16px;background:rgba(201,162,39,.08)}
+.epi-score-n{font-family:var(--ff-title);font-size:2.5rem;font-weight:900;color:var(--gold);line-height:1}
+.epi-score-max{font-size:.75rem;color:var(--cream-d);font-family:var(--ff-ui)}
+.epi-profile{font-family:var(--ff-title);font-size:1.3rem;color:var(--cream);
+  margin-bottom:6px;font-weight:700}
+.epi-profile-desc{font-size:.85rem;color:var(--cream-m);margin-bottom:24px}
+.epi-choices-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.ecc-card{border-radius:var(--r);padding:14px;text-align:left}
+.ecc-you{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.25)}
+.ecc-real{background:rgba(139,26,26,.1);border:1px solid rgba(239,83,80,.2)}
+.ecc-label{font-family:var(--ff-ui);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ecc-you .ecc-label{color:var(--gold)}
+.ecc-real .ecc-label{color:#EF9A9A}
+.ecc-item{font-size:.8rem;color:var(--cream-m);padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);line-height:1.35}
+.ecc-item:last-child{border-bottom:none}
+.ecc-item strong{font-weight:600;color:var(--cream)}
+.epi-stats-row{display:flex;gap:12px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.epi-stat-box{background:rgba(20,35,20,.8);border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r);padding:14px 20px;min-width:130px;text-align:center;
+  flex:1;max-width:180px}
+.esb-icon{font-size:1.5rem;margin-bottom:4px}
+.esb-val{font-family:var(--ff-title);font-size:1.7rem;font-weight:700;color:var(--gold);line-height:1}
+.esb-lbl{font-size:.65rem;color:var(--cream-d);font-family:var(--ff-ui);
+  text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.epi-message{background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);
+  border-radius:var(--r);padding:16px;font-size:.88rem;color:var(--cream-m);
+  line-height:1.7;margin-bottom:20px;text-align:left}
+.epi-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-share{display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(145deg,var(--gold),var(--gold-d));
+  color:var(--black);padding:13px 28px;border-radius:50px;border:none;cursor:pointer;
+  font-family:var(--ff-ui);font-size:.88rem;font-weight:700;letter-spacing:.04em;
+  box-shadow:0 4px 20px rgba(201,162,39,.35);transition:all .2s;text-transform:uppercase}
+.btn-share:hover{transform:translateY(-2px)}
+.btn-play-again{display:inline-flex;align-items:center;gap:8px;
+  background:transparent;border:2px solid rgba(201,162,39,.4);
+  color:var(--gold);padding:11px 26px;border-radius:50px;cursor:pointer;
+  font-family:var(--ff-ui);font-size:.88rem;font-weight:700;letter-spacing:.04em;
+  transition:all .2s;text-transform:uppercase}
+.btn-play-again:hover{border-color:var(--gold);background:rgba(201,162,39,.1)}
+
+/* ======================================================
+   SCORE STARS
+   ====================================================== */
+.stars{display:flex;gap:4px;justify-content:center;margin-bottom:12px}
+.star{font-size:1.3rem;filter:grayscale(1);opacity:.3;transition:all .5s}
+.star.lit{filter:none;opacity:1;animation:starPop .4s ease-out}
+@keyframes starPop{0%{transform:scale(.5)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* ======================================================
+   MODALS & TRANSITIONS
+   ====================================================== */
+.fade-overlay{position:fixed;inset:0;background:var(--black);z-index:500;
+  opacity:0;pointer-events:none;transition:opacity .5s}
+.fade-overlay.fading{opacity:1;pointer-events:all}
+
+/* ======================================================
+   CHOICE REVEAL ANIMATION
+   ====================================================== */
+@keyframes choiceReveal{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:none;opacity:1}
+}
+.choice-btn{animation:choiceReveal .4s ease-out both}
+.choice-btn:nth-child(1){animation-delay:.05s}
+.choice-btn:nth-child(2){animation-delay:.15s}
+.choice-btn:nth-child(3){animation-delay:.25s}
+
+/* ======================================================
+   SCROLL CUSTOMIZATION
+   ====================================================== */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(201,162,39,.3);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+@media(max-height:650px){
+  .ch-panel,.result-panel{max-height:62vh}
+  .epi-inner{padding-top:10px}
+}
+@media(max-width:560px){
+  .choices{grid-template-columns:1fr}
+  .epi-choices-compare{grid-template-columns:1fr}
+  .prog-steps{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- FADE OVERLAY -->
+<div class="fade-overlay" id="fade-overlay"></div>
+
+<!-- SCENE CANVAS (background) -->
+<canvas id="scene-canvas"></canvas>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar">
+  <span class="prog-title">🦫 Castores</span>
+  <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  <div class="prog-steps" id="prog-steps"></div>
+</div>
+
+<!-- ======== TITLE SCREEN ======== -->
+<div class="screen active" id="screen-title">
+  <div style="display:flex;flex-direction:column;align-items:center;padding:24px;margin-top:auto;margin-bottom:auto">
+    <p class="title-eyebrow">Newsgame · Chequeate</p>
+    <h1 class="title-main">CASTORES</h1>
+    <p class="title-sub">El costo de una decisión</p>
+    <div class="title-divider"></div>
+    <p class="title-desc">En 1946, Argentina tomó una decisión que nadie investigó, nadie cuestionó y nadie previó. Sus consecuencias aún se sienten hoy en los bosques de Tierra del Fuego.</p>
+    <button class="title-start" id="btn-title-start">
+      <span>Comenzar</span> <span>→</span>
+    </button>
+    <span class="title-badge">5 decisiones · 10 min · Basado en hechos reales</span>
+  </div>
+</div>
+
+<!-- Chapter screens generated dynamically by JS -->
+<div id="chapter-container"></div>
+
+<!-- ======== EPILOGUE SCREEN ======== -->
+<div class="screen" id="screen-epilogue">
+  <div class="epi-inner">
+    <h2 class="epi-title">El resultado de las decisiones</h2>
+    <p class="epi-sub" id="epi-date">Tierra del Fuego · 2026</p>
+    
+    <div class="stars" id="epi-stars">
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+    </div>
+    <div class="epi-score-ring">
+      <span class="epi-score-n" id="epi-score-n">0</span>
+      <span class="epi-score-max">/ 15 pts</span>
+    </div>
+    <h3 class="epi-profile" id="epi-profile">—</h3>
+    <p class="epi-profile-desc" id="epi-profile-desc">—</p>
+
+    <div class="epi-choices-compare">
+      <div class="ecc-card ecc-you">
+        <div class="ecc-label">📋 Tus decisiones</div>
+        <div id="ecc-your-choices"></div>
+      </div>
+      <div class="ecc-card ecc-real">
+        <div class="ecc-label">📰 Lo que realmente ocurrió</div>
+        <div id="ecc-real-choices"></div>
+      </div>
+    </div>
+
+    <div class="epi-stats-row">
+      <div class="epi-stat-box"><div class="esb-icon">🦸</div><div class="esb-val">Decenas de miles</div><div class="esb-lbl">Castores en la región hoy</div></div>
+      <div class="epi-stat-box"><div class="esb-icon">🌲</div><div class="esb-val">Lenga y guindo</div><div class="esb-lbl">Especies nativas más afectadas</div></div>
+      <div class="epi-stat-box"><div class="esb-icon">📅</div><div class="esb-val">80 años</div><div class="esb-lbl">Desde la introducción original</div></div>
+      <div class="epi-stat-box"><div class="esb-icon">⏳</div><div class="esb-val">Décadas</div><div class="esb-lbl">Para recuperar el bosque</div></div>
+    </div>
+
+    <div class="epi-message">
+      En 1946, veinte castores provenientes de Canadá fueron introducidos en la Isla Grande de Tierra del Fuego para impulsar una industria peletera que nunca prosperó. Sin depredadores naturales, su población se expandió rápidamente y transformó los ecosistemas locales. Los diques construidos por los castores inundaron bosques de lenga y guindo —especies nativas no adaptadas al agua— creando los llamados “bosques fantasma”. Hoy, la recuperación de las áreas afectadas puede requerir varias décadas, y el caso sigue siendo un recordatorio de la importancia de evaluar el impacto ambiental antes de tomar decisiones irreversibles.
+    </div>
+
+    <div class="epi-actions">
+      <button class="btn-share" onclick="shareGame()">📤 Compartir el juego</button>
+      <button class="btn-play-again" id="btn-play-again">↺ Jugar nuevamente</button>
+      <button class="btn-play-again" onclick="window.open('https://chequeado.com','_blank')" style="border-color:rgba(255,255,255,.2);color:var(--cream-m)">📰 Leer la nota</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   GAME CONTENT — 5 Capítulos de Decisiones Históric  {
+    id: 1,
+    year: 1946,
+    yearLabel: "1946",
+    title: "El Origen del Problema",
+    scene: 'pristine',
+    narrative: "Argentina quiere impulsar la economía de la Isla Grande de Tierra del Fuego. Se propone importar castores provenientes de Canadá para crear una industria peletera en la región. No existe ningún estudio ecológico previo. Se pide tu recomendación.",
+    question: "¿Qué recomiendas al gobierno?",
+    choices: [
+      {
+        text: "Introducir 20 castores sin ningún estudio previo",
+        isReal: true, isExpert: false, score: 1,
+        consequence: "Sin estudios previos, nadie advirtió sobre la ausencia de depredadores naturales ni sobre la fragilidad del bosque nativo de la isla."
+      },
+      {
+        text: "Exigir un estudio de impacto ambiental antes de cualquier acción",
+        isReal: false, isExpert: true, score: 3,
+        consequence: "Un estudio habría advertido que los castores no tienen depredadores naturales en el hemisferio sur y que el bosque nativo sería vulnerable a las inundaciones."
+      },
+      {
+        text: "Buscar alternativas económicas que no alteren el ecosistema",
+        isReal: false, isExpert: false, score: 2,
+        consequence: "Una alternativa económica diferente habría evitado el problema sin renunciar al desarrollo de la región."
+      }
+    ],
+    realChoiceIndex: 0,
+    realTitle: "Lo que realmente ocurrió",
+    realText: "En 1946, veinte castores provenientes de Canadá fueron introducidos en la Isla Grande de Tierra del Fuego con el objetivo de impulsar una industria peletera. La iniciativa no estuvo respaldada por ningún estudio ecológico previo.",
+    realFact: "La industria peletera que justificó la introducción nunca prosperó, pero las consecuencias ambientales fueron irreversibles.",
+    stats: [
+      {icon:"🦸", value:"20", label:"Castores introducidos"},
+      {icon:"📋", value:"0", label:"Estudios ecológicos previos"},
+      {icon:"📅", value:"1946", label:"Año de la decisión"}
+    ]
+  },:  {
+    id: 2,
+    year: 1965,
+    yearLabel: "1960s",
+    title: "La Primera Advertencia",
+    scene: 'early',
+    narrative: "Han pasado casi dos décadas. Investigadores advierten que la población de castores creció considerablemente a partir de los 20 ejemplares originales. La ausencia de depredadores favorecía su reproducción sin control. Los primeros bosques muestran signos de daño.",
+    question: "¿Cuál debería ser la respuesta del gobierno?",
+    choices: [
+      {
+        text: "Implementar un programa de caza y control inmediato",
+        isReal: false, isExpert: true, score: 3,
+        consequence: "Una intervención temprana habría mantenido la población bajo control antes de que el daño se volviera irreversible."
+      },
+      {
+        text: "Seguir monitoreando por más años antes de actuar",
+        isReal: true, isExpert: false, score: 1,
+        consequence: "El gobierno eligió esperar. Para cuando actuó, la situación era mucho más difícil y costosa de controlar."
+      },
+      {
+        text: "Abrir la caza comercial libre para que el mercado regule la población",
+        isReal: false, isExpert: false, score: 1,
+        consequence: "La caza comercial desregulada generalmente no es suficiente para controlar una especie invasora ya establecida."
+      }
+    ],
+    realChoiceIndex: 1,
+    realTitle: "Lo que realmente ocurrió",
+    realText: "La respuesta fue insuficiente y tardía. Los castores se reprodujeron sin restricciones durante décadas. La población aumentó considerablemente y ocupó gran parte de las cuencas hidrográficas de la Isla Grande de Tierra del Fuego.",
+    realFact: "La falta de acción temprana es hoy considerada por biólogos como el error más costoso del manejo de la especie.",
+    stats: [
+      {icon:"🦸", value:"Miles", label:"De castores para los años '70"},
+      {icon:"🌲", value:"Creciente", label:"Daño al bosque nativo"},
+      {icon:"⏰", value:"Décadas", label:"De acción insuficiente"}
+    ]
+  },bel:"Castores para 1975"},
+      {icon:"🌲", value:"30.000", label:"Hectáreas afectadas"},
+      {icon:"⏰", value:"20 años", label:"De inacción"}
+    ]
+  },
+  {
+    id: 3,
+    year: 1976,
+    yearLabel: "1976",
+    title: "Los Bosques Fantasma",
+    scene: 'ghost',
+    narrative: "Los científicos documentan un fenómeno grave: 'bosques fantasma'. Árboles de lenga y guindo muertos de pie en el agua represada por los diques de castores. Estas especies nativas no están adaptadas a permanecer bajo el agua durante largos períodos.",
+    question: "¿Cuál es la respuesta adecuada?",
+    choices: [
+      {
+        text: "Declarar emergencia ambiental y solicitar ayuda internacional",
+        isReal: false, isExpert: true, score: 3,
+        consequence: "Una declaración de emergencia con ayuda internacional habría acelerado la respuesta y conseguido recursos suficientes para el control."
+      },
+      {
+        text: "Crear un plan de manejo con caza limitada financiada por el estado",
+        isReal: true, isExpert: false, score: 1,
+        consequence: "Los programas de caza fueron insuficientes. La demanda de pieles cayó y el incentivo económico desapareció con ella."
+      },
+      {
+        text: "Reintroducir depredadores naturales como el puma",
+        isReal: false, isExpert: false, score: 2,
+        consequence: "Reintroducir depredadores en una isla tiene sus propios riesgos ecológicos y logísticos complejos."
+      }
+    ],
+    realChoiceIndex: 1,
+    realTitle: "Lo que realmente ocurrió",
+    realText: "Argentina y Chile implementaron programas de control y monitoreo para reducir el impacto. Sin embargo, la magnitud del problema representó un desafío a largo plazo. Los diques modificaron el flujo del agua y transformaron el paisaje de forma permanente.",
+    realFact: "Los bosques fantasma de Tierra del Fuego son visibles desde el aire: árboles grises muertos parados en agua oscura acumulada por los diques.",
+    stats: [
+      {icon:"🌲", value:"Lenga", label:"y guindo: especies afectadas"},
+      {icon:"💧", value:"Diques", label:"Modifican el flujo del agua"},
+      {icon:"📉", value:"Décadas", label:"Para recuperar el bosque"}
+    ]
+  },
+  {
+    id: 4,
+    year: 1991,
+    yearLabel: "1991",
+    title: "Sin Fronteras",
+    scene: 'crisis',
+    narrative: "Los castores cruzaron el Canal de Beagle hacia Chile. Un ecosistema que nunca los conoció ahora los enfrenta sin plan de contingencia. Chile no tiene legislación ni programa para enfrentar la invasión.",
+    question: "¿Qué propones hacer?",
+    choices: [
+      {
+        text: "Proponer un acuerdo binacional urgente de erradicación total",
+        isReal: false, isExpert: true, score: 3,
+        consequence: "Una respuesta coordinada inmediata hubiera evitado que la invasión se consolidara en territorio chileno, donde hoy hay más de 20.000 castores."
+      },
+      {
+        text: "Que cada país maneje el problema de forma independiente",
+        isReal: true, isExpert: false, score: 1,
+        consequence: "Actuar por separado implicó duplicar esfuerzos, gastar el doble de recursos y lograr la mitad del resultado. Los castores cruzaban la frontera de todos modos."
+      },
+      {
+        text: "Crear una zona de libre circulación y estudiar el comportamiento",
+        isReal: false, isExpert: false, score: 0,
+        consequence: "Más observación sin acción solo habría agravado el problema y dado a los castores más tiempo para asentarse."
+      }
+    ],
+    realChoiceIndex: 1,
+    realTitle: "Lo que realmente ocurrió",
+    realText: "Argentina y Chile actuaron por separado durante años. Sin coordinación, los esfuerzos fueron ineficientes. Chile tardó en reconocer la magnitud del problema y en crear una legislación específica para tratar la especie como invasora.",
+    realFact: "Hoy se estima que hay más de 20.000 castores en territorio chileno, principalmente en la Región de Magallanes.",
+      {
+    id: 5,
+    year: 2008,
+    yearLabel: "2008",
+    title: "El Desafío Actual",
+    scene: 'late',
+    narrative: "Argentina y Chile impulsan programas de control y monitoreo para restaurar las áreas afectadas. Entre las medidas aplicadas se encuentran la captura de ejemplares en zonas prioritarias y proyectos de recuperación ambiental. Pero la magnitud del problema es inmensa.",
+    question: "¿Cuál debe ser el enfoque principal?",
+    choices: [
+      {
+        text: "Erradicación total de los castores con financiamiento internacional",
+        isReal: false, isExpert: true, score: 3,
+        consequence: "Una erradicación total con recursos adecuados sería la única forma de permitir la recuperación plena del bosque nativo."
+      },
+      {
+        text: "Programas de control y monitoreo sin meta de erradicación",
+        isReal: true, isExpert: false, score: 1,
+        consequence: "Los programas de control reducen el impacto pero no resuelven el problema de fondo. La recuperación del bosque puede tomar varias décadas."
+      },
+      {
+        text: "Declarar los castores patrimonio natural e integrarlos al ecosistema",
+        isReal: false, isExpert: false, score: 0,
+        consequence: "Los castores no son parte del ecosistema patagónico. Su aceptación como 'nativos' profundizaría el daño sobre las especies endémicas."
+      }
+    ],
+    realChoiceIndex: 1,
+    realTitle: "Lo que realmente ocurre hoy",
+    realText: "Argentina y Chile han impulsado programas de control y monitoreo. Sin embargo, la magnitud del problema representa un desafío a largo plazo. La recuperación de los bosques afectados puede requerir varias décadas debido al lento crecimiento de las especies nativas.",
+    realFact: "El caso demuestra cómo la introducción de una especie fuera de su hábitat puede generar consecuencias inesperadas y refuerza la importancia de evaluar riesgos ambientales antes de actuar.",
+    stats: [
+      {icon:"🌱", label:"Decenas de miles", value:"Castores estimados hoy"},
+      {icon:"🌲", value:"Décadas", label:"Para recuperar el bosque"},
+      {icon:"📢", value:"Hoy", label:"Aún sin solución completa"}
+    ]
+  } ser eliminada completamente, no solo controlada.",
+    stats: [
+      {icon:"📋", value:"2008", label:"Año del acuerdo"},
+      {icon:"💰", value:"8%", label:"Del presupuesto necesario"},
+      {icon:"🦫", value:"~70.000", label:"Castores en 2026"}
+    ]
+  }
+];
+
+const PROFILES = [
+  {min:13, title:"Experto Ambiental", desc:"Tus decisiones reflejan el criterio científico. Priorizaste la evidencia, la precaución y la cooperación. Lamentablemente, los gobiernos tomaron otro camino.", color:"#4CAF50"},
+  {min:10, title:"Pragmático Informado", desc:"Tus elecciones combinaron conocimiento y realismo. No siempre elegiste lo ideal, pero tus decisiones hubieran mejorado el resultado histórico.", color:"#8BC34A"},
+  {min:7,  title:"Político Promedio", desc:"Tomaste decisiones similares a las que tomaron los gobiernos de Argentina y Chile. Razonables a corto plazo, costosas a largo plazo.", color:"var(--gold)"},
+  {min:0,  title:"Aprendiendo del Pasado", desc:"Tus decisiones reflejan los errores históricos más comunes: ignorar la ciencia, actuar tarde, o no actuar en absoluto.", color:"#EF5350"}
+];
+
+/* ============================================================
+   SCENE RENDERING — Beautiful CSS backgrounds on Canvas
+   Each scene is rendered programmatically to look stunning
+   ============================================================ */
+const sceneCanvas = document.getElementById('scene-canvas');
+const sctx = sceneCanvas.getContext('2d');
+let sceneAnimId = null;
+let currentScene = null;
+let sceneTime = 0;
+
+function resizeSceneCanvas(){
+  sceneCanvas.width  = window.innerWidth;
+  sceneCanvas.height = window.innerHeight;
+}
+resizeSceneCanvas();
+window.addEventListener('resize', resizeSceneCanvas);
+
+const SCENE_RENDERERS = {
+  title(ctx, W, H, t) {
+    // Deep forest at night/dusk
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0A1F0A');
+    g.addColorStop(.4,'#0D2B0D');
+    g.addColorStop(.8,'#081A08');
+    g.addColorStop(1,'#050F05');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // Stars
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    for(let i=0;i<120;i++){
+      const sx = ((i*137.5)%1)*W;
+      const sy = ((i*97.3)%1)*H*.55;
+      const br = Math.sin(t*.5+i)*.3+.7;
+      ctx.globalAlpha=br*.6;
+      ctx.beginPath();ctx.arc(sx,sy,Math.random()<.05?.8:.3,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    // Silhouette mountains
+    ctx.fillStyle='#05120A';
+    ctx.beginPath();
+    ctx.moveTo(0,H*.75);
+    [0,.1,.18,.25,.32,.38,.45,.52,.6,.68,.75,.82,.9,1].forEach((x,i)=>{
+      const py = [.75,.55,.65,.48,.58,.62,.52,.68,.5,.62,.6,.7,.58,.75][i];
+      ctx.lineTo(x*W, py*H);
+    });
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // Snow on peaks
+    ctx.fillStyle='rgba(200,210,220,0.15)';
+    [[.25,.48,.06],[.38,.52,.05],[.52,.5,.07],[.68,.48,.06]].forEach(([px,py,r])=>{
+      ctx.beginPath(); ctx.arc(px*W,py*H,r*H,0,Math.PI*2); ctx.fill();
+    });
+    // Trees silhouette at bottom
+    ctx.fillStyle='#030A03';
+    for(let i=0;i<28;i++){
+      const tx=i/27*W, th=0.06+((i*73)%1)*.06;
+      ctx.beginPath(); ctx.moveTo(tx,H);
+      ctx.lineTo(tx+6,H*(1-th)); ctx.lineTo(tx+16,H*(1-th*.3));
+      ctx.lineTo(tx+12,H); ctx.fill();
+    }
+    // Aurora borealis effect
+    ctx.save();
+    ctx.globalAlpha=0.07+Math.sin(t*.3)*.03;
+    const aurora=ctx.createLinearGradient(0,0,W,0);
+    aurora.addColorStop(0,'rgba(46,125,50,0)');
+    aurora.addColorStop(.3,'rgba(76,175,80,.8)');
+    aurora.addColorStop(.6,'rgba(129,199,132,.6)');
+    aurora.addColorStop(1,'rgba(46,125,50,0)');
+    ctx.fillStyle=aurora;
+    ctx.fillRect(0,H*.05,W,H*.3);
+    ctx.restore();
+  },
+
+  pristine(ctx, W, H, t) {
+    // 1946 pristine forest — try to load image first
+    const img = SCENE_IMGS['scene_1946_pristine'];
+    if(img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img,0,0,W,H); return;
+    }
+    // Beautiful forest fallback
+    const sky = ctx.createLinearGradient(0,0,0,H*.5);
+    sky.addColorStop(0,'#87CEEB'); sky.addColorStop(1,'#B0E0F5');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // Mountains
+    ctx.fillStyle='#4A7A6A';
+    ctx.beginPath(); ctx.moveTo(0,H*.65);
+    [[0,.65],[.1,.42],[.22,.48],[.35,.38],[.48,.44],[.6,.35],[.72,.42],[.85,.4],[1,.65]].forEach(([x,y])=>ctx.lineTo(x*W,y*H));
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // Snow caps
+    ctx.fillStyle='rgba(240,248,255,0.85)';
+    [[.35,.38,.08],[.6,.35,.06],[.85,.4,.07]].forEach(([x,y,r])=>{
+      ctx.beginPath(); ctx.arc(x*W,y*H,r*W,0,Math.PI*2); ctx.fill();
+    });
+    // Forest ground
+    const fg = ctx.createLinearGradient(0,H*.6,0,H);
+    fg.addColorStop(0,'#1B5E20'); fg.addColorStop(.5,'#2E7D32'); fg.addColorStop(1,'#0D3314');
+    ctx.fillStyle=fg; ctx.fillRect(0,H*.6,W,H*.4);
+    // Trees
+    [.05,.12,.18,.25,.32,.38,.44,.5,.57,.63,.7,.76,.82,.88,.95].forEach((tx,i)=>{
+      const th=0.28+((i*53)%1)*.15;
+      const col=['#1B5E20','#2E7D32','#388E3C','#1A4D1A'][i%4];
+      ctx.fillStyle=col;
+      ctx.beginPath(); ctx.moveTo(tx*W, H*(1-th));
+      ctx.bezierCurveTo(tx*W-18,H*(1-th*.5),tx*W-22,H,tx*W-12,H);
+      ctx.lineTo(tx*W+12,H);
+      ctx.bezierCurveTo(tx*W+22,H,tx*W+18,H*(1-th*.5),tx*W,H*(1-th));
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle='rgba(102,187,106,.3)';
+      ctx.beginPath(); ctx.arc(tx*W, H*(1-th)+12, 18, 0, Math.PI*2); ctx.fill();
+    });
+    // River
+    ctx.strokeStyle='rgba(100,181,246,.65)'; ctx.lineWidth=28+Math.sin(t)*.5;
+    ctx.beginPath(); ctx.moveTo(W*.15,H); ctx.bezierCurveTo(W*.25,H*.7,W*.35,H*.65,W*.5,H);
+    ctx.stroke();
+    ctx.strokeStyle='rgba(200,230,255,.3)'; ctx.lineWidth=8;
+    ctx.setLineDash([20,15]); ctx.lineDashOffset=t*30; ctx.stroke(); ctx.setLineDash([]);
+    // Light rays
+    ctx.save(); ctx.globalAlpha=0.04+Math.sin(t*.5)*.01;
+    ctx.fillStyle='#FFF8E1';
+    [[.3,.4],[.55,.35],[.7,.4]].forEach(([lx,ly])=>{
+      ctx.beginPath(); ctx.moveTo(lx*W,0); ctx.lineTo(lx*W-40,H); ctx.lineTo(lx*W+40,H); ctx.closePath(); ctx.fill();
+    });
+    ctx.restore();
+  },
+
+  early(ctx, W, H, t) {
+    // 1960s — forest with early beaver signs
+    const img = SCENE_IMGS['scene_early'];
+    if(img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img,0,0,W,H); return;
+    }
+    // Slightly more muted than pristine
+    const sky = ctx.createLinearGradient(0,0,0,H*.5);
+    sky.addColorStop(0,'#6B9EB5'); sky.addColorStop(1,'#8DC0D8');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // Mountains (same)
+    ctx.fillStyle='#3D6858';
+    ctx.beginPath(); ctx.moveTo(0,H*.65);
+    [[0,.65],[.1,.42],[.22,.48],[.35,.38],[.48,.44],[.6,.35],[.72,.42],[.85,.4],[1,.65]].forEach(([x,y])=>ctx.lineTo(x*W,y*H));
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // Forest ground with some gaps
+    const fg2 = ctx.createLinearGradient(0,H*.6,0,H);
+    fg2.addColorStop(0,'#2E7D32'); fg2.addColorStop(1,'#1B3A1B');
+    ctx.fillStyle=fg2; ctx.fillRect(0,H*.6,W,H*.4);
+    // Trees (fewer, some stumps)
+    [.05,.12,.2,.27,.45,.52,.58,.65,.72,.79,.86,.93].forEach((tx,i)=>{
+      const th=0.22+((i*53)%1)*.12;
+      ctx.fillStyle='#2E7D32';
+      ctx.beginPath(); ctx.moveTo(tx*W, H*(1-th));
+      ctx.bezierCurveTo(tx*W-15,H*(1-th*.5),tx*W-18,H,tx*W-10,H);
+      ctx.lineTo(tx*W+10,H);
+      ctx.bezierCurveTo(tx*W+18,H,tx*W+15,H*(1-th*.5),tx*W,H*(1-th));
+      ctx.closePath(); ctx.fill();
+    });
+    // Some stumps
+    [[.34,.38],[.4,.42]].forEach(([sx,sy])=>{
+      ctx.fillStyle='#5D4037'; ctx.beginPath(); ctx.rect(sx*W-4,sy*H,8,H*(1-sy)); ctx.fill();
+      ctx.fillStyle='#6D4C41'; ctx.beginPath(); ctx.ellipse(sx*W,sy*H,8,4,0,0,Math.PI*2); ctx.fill();
+    });
+    // Small beaver dam in river
+    ctx.strokeStyle='rgba(80,150,200,.55)'; ctx.lineWidth=22;
+    ctx.beginPath(); ctx.moveTo(W*.1,H); ctx.bezierCurveTo(W*.2,H*.72,W*.3,H*.68,W*.42,H);
+    ctx.stroke();
+    // Dam structure
+    ctx.strokeStyle='#5D4037'; ctx.lineWidth=8;
+    ctx.beginPath(); ctx.moveTo(W*.2-18,H*.76); ctx.lineTo(W*.2+18,H*.76); ctx.stroke();
+    ctx.strokeStyle='#6D4C41'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(W*.21-12,H*.75); ctx.lineTo(W*.21+10,H*.77); ctx.stroke();
+  },
+
+  ghost(ctx, W, H, t) {
+    // 1975 ghost forest — dark, eerie
+    const img = SCENE_IMGS['scene_ghost_forest'];
+    if(img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img,0,0,W,H); return;
+    }
+    const sky = ctx.createLinearGradient(0,0,0,H*.6);
+    sky.addColorStop(0,'#3D4A4A'); sky.addColorStop(1,'#5A6060');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    // Mountains (grey, gloomy)
+    ctx.fillStyle='#2A3835';
+    ctx.beginPath(); ctx.moveTo(0,H*.6);
+    [[0,.6],[.1,.42],[.22,.5],[.35,.4],[.48,.46],[.6,.38],[.72,.44],[.85,.42],[1,.6]].forEach(([x,y])=>ctx.lineTo(x*W,y*H));
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // Dark flooded ground
+    const fg3=ctx.createLinearGradient(0,H*.55,0,H);
+    fg3.addColorStop(0,'#1A2A28'); fg3.addColorStop(.5,'#0F1F1E'); fg3.addColorStop(1,'#080F0F');
+    ctx.fillStyle=fg3; ctx.fillRect(0,H*.55,W,H*.45);
+    // Dark water reflections
+    ctx.save(); ctx.globalAlpha=0.25+Math.sin(t*.3)*.05;
+    ctx.fillStyle='#0D2A2F';
+    ctx.fillRect(0,H*.72,W,H*.28);
+    ctx.restore();
+    // Dead grey trees (ghost forest)
+    for(let i=0;i<22;i++){
+      const tx=(i/21)*W, th=0.28+((i*67)%1)*.2;
+      const alpha=0.5+((i*37)%1)*.5;
+      ctx.strokeStyle=`rgba(100,120,120,${alpha})`; ctx.lineWidth=2.5;
+      ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(tx,H); ctx.lineTo(tx,H*(1-th)); ctx.stroke();
+      // Bare branches
+      const brs=[[-1,-.3,9],[1,-.28,8],[-.7,-.2,6],[.8,-.18,7]];
+      brs.forEach(([dx,dy,l])=>{
+        ctx.lineWidth=1.2;
+        ctx.beginPath();
+        ctx.moveTo(tx,H*(1-th+.06));
+        ctx.lineTo(tx+dx*l,H*(1-th+.06+dy*.12));
+        ctx.stroke();
+      });
+      // Water reflection
+      ctx.strokeStyle=`rgba(60,80,80,${alpha*.4})`;
+      ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(tx,H*.72); ctx.lineTo(tx,H*.72+th*H*.4);
+      ctx.stroke();
+    }
+    // Beaver dams
+    [[.25,.68],[.55,.7],[.75,.67]].forEach(([dx,dy])=>{
+      ctx.strokeStyle='#3E2723'; ctx.lineWidth=10;
+      ctx.beginPath(); ctx.moveTo(dx*W-30,dy*H); ctx.lineTo(dx*W+30,dy*H); ctx.stroke();
+      ctx.strokeStyle='#4E342E'; ctx.lineWidth=5;
+      ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(dx*W-25,dy*H+3); ctx.lineTo(dx*W+25,dy*H+3); ctx.stroke();
+      ctx.setLineDash([]);
+    });
+    // Mist/fog
+    ctx.save(); ctx.globalAlpha=.12+Math.sin(t*.2)*.04;
+    const fog=ctx.createLinearGradient(0,H*.6,0,H*.8);
+    fog.addColorStop(0,'transparent'); fog.addColorStop(.5,'#B0C4C4'); fog.addColorStop(1,'transparent');
+    ctx.fillStyle=fog; ctx.fillRect(0,H*.6,W,H*.2); ctx.restore();
+  },
+
+  crisis(ctx, W, H, t) {
+    // 1991 crisis — aerial view feel
+    const img = SCENE_IMGS['scene_crisis_1990'];
+    if(img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img,0,0,W,H); return;
+    }
+    // Dramatic overcast sky
+    const sky2=ctx.createLinearGradient(0,0,0,H*.45);
+    sky2.addColorStop(0,'#283035'); sky2.addColorStop(1,'#3D484E');
+    ctx.fillStyle=sky2; ctx.fillRect(0,0,W,H);
+    // Aerial ground — green patches + dark flood patches
+    const land=ctx.createRadialGradient(W*.5,H*.6,0,W*.5,H*.6,W*.7);
+    land.addColorStop(0,'#2A3E2A'); land.addColorStop(.4,'#1E2E1E'); land.addColorStop(1,'#0D1A0D');
+    ctx.fillStyle=land; ctx.fillRect(0,H*.4,W,H*.6);
+    // Large flooded areas (dark blue)
+    [[.3,.65,.18,.12],[.55,.7,.22,.1],[.18,.8,.12,.08],[.72,.6,.16,.1]].forEach(([fx,fy,rw,rh])=>{
+      const flood=ctx.createRadialGradient(fx*W,fy*H,0,fx*W,fy*H,rw*W);
+      flood.addColorStop(0,'rgba(21,65,100,.85)');
+      flood.addColorStop(.6,'rgba(21,65,100,.65)');
+      flood.addColorStop(1,'rgba(21,65,100,0)');
+      ctx.fillStyle=flood; ctx.beginPath(); ctx.ellipse(fx*W,fy*H,rw*W,rh*H,0,0,Math.PI*2); ctx.fill();
+    });
+    // Dead forest patches (grey)
+    for(let i=0;i<60;i++){
+      const tx=((i*137)%1)*W, ty=H*.5+((i*97)%1)*H*.45;
+      const alpha=(i%3===0)?.6:.3;
+      ctx.strokeStyle=`rgba(90,100,90,${alpha})`; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(tx,ty-18-((i*43)%1)*12); ctx.stroke();
+    }
+    // Some green patches (surviving forest)
+    [[.05,.7,.08,.12],[.85,.65,.07,.1],[.92,.78,.09,.11]].forEach(([gx,gy,gr,grh])=>{
+      const gf=ctx.createRadialGradient(gx*W,gy*H,0,gx*W,gy*H,gr*W);
+      gf.addColorStop(0,'rgba(46,125,50,.7)');
+      gf.addColorStop(.7,'rgba(27,94,32,.5)');
+      gf.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=gf; ctx.beginPath(); ctx.ellipse(gx*W,gy*H,gr*W,grh*H,0,0,Math.PI*2); ctx.fill();
+    });
+    // Winding rivers
+    ctx.strokeStyle='rgba(30,90,140,.6)'; ctx.lineWidth=18;
+    ctx.beginPath(); ctx.moveTo(0,H*.65); ctx.bezierCurveTo(W*.3,H*.6,W*.6,H*.7,W,H*.65); ctx.stroke();
+    ctx.lineWidth=10;
+    ctx.beginPath(); ctx.moveTo(W*.2,H); ctx.bezierCurveTo(W*.3,H*.75,W*.4,H*.7,W*.6,H*.75); ctx.stroke();
+    // Overcast clouds
+    ctx.save(); ctx.globalAlpha=.15+Math.sin(t*.15)*.05;
+    ctx.fillStyle='#899AA5';
+    [[.2,.15,.25,.08],[.6,.1,.3,.06],[.45,.2,.2,.07]].forEach(([cx,cy,cw,ch])=>{
+      ctx.beginPath(); ctx.ellipse(cx*W,cy*H,cw*W,ch*H,0,0,Math.PI*2); ctx.fill();
+    });
+    ctx.restore();
+  },
+
+  late(ctx, W, H, t) {
+    // 2008 signing — diplomatic, formal feel
+    const img = SCENE_IMGS['scene_2026'];
+    if(img && img.complete && img.naturalWidth) {
+      ctx.drawImage(img,0,0,W,H); return;
+    }
+    // Slightly recovering landscape
+    const sky3=ctx.createLinearGradient(0,0,0,H*.5);
+    sky3.addColorStop(0,'#455A64'); sky3.addColorStop(1,'#607D8B');
+    ctx.fillStyle=sky3; ctx.fillRect(0,0,W,H);
+    // Mountains
+    ctx.fillStyle='#37474F';
+    ctx.beginPath(); ctx.moveTo(0,H*.7);
+    [[0,.7],[.1,.5],[.22,.58],[.35,.46],[.48,.52],[.6,.44],[.72,.5],[.85,.48],[1,.7]].forEach(([x,y])=>ctx.lineTo(x*W,y*H));
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+    // Mixed landscape (partly recovered)
+    const mix=ctx.createLinearGradient(0,H*.6,0,H);
+    mix.addColorStop(0,'#263238'); mix.addColorStop(.5,'#1B2C1B'); mix.addColorStop(1,'#0D1A0D');
+    ctx.fillStyle=mix; ctx.fillRect(0,H*.6,W,H*.4);
+    // Some recovering green patches
+    [[.1,.8,.1,.05],[.3,.75,.08,.04],[.7,.7,.12,.06],[.9,.75,.1,.05]].forEach(([gx,gy,gr,gh])=>{
+      ctx.fillStyle='rgba(46,125,50,.5)';
+      ctx.beginPath(); ctx.ellipse(gx*W,gy*H,gr*W,gh*H,0,0,Math.PI*2); ctx.fill();
+    });
+    // Still some dead trees
+    for(let i=0;i<14;i++){
+      const tx=.2*W+((i*137)%1)*.6*W, ty=H*.65+((i*97)%1)*H*.25;
+      ctx.strokeStyle='rgba(80,90,90,.5)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(tx,ty-12-((i*43)%1)*10); ctx.stroke();
+    }
+    // Flooded areas (smaller than before)
+    ctx.fillStyle='rgba(21,65,100,.4)';
+    ctx.beginPath(); ctx.ellipse(W*.4,H*.77,W*.08,H*.04,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(W*.65,H*.72,W*.06,H*.03,0,0,Math.PI*2); ctx.fill();
+    // River (still there)
+    ctx.strokeStyle='rgba(40,100,150,.5)'; ctx.lineWidth=16;
+    ctx.beginPath(); ctx.moveTo(W*.15,H); ctx.bezierCurveTo(W*.3,H*.75,W*.5,H*.7,W*.8,H); ctx.stroke();
+  }
+};
+
+// Scene image cache (will be populated when quota resets)
+const SCENE_IMGS = {};
+
+function renderScene(sceneName, t){
+  const W = sceneCanvas.width, H = sceneCanvas.height;
+  sctx.clearRect(0,0,W,H);
+  const renderer = SCENE_RENDERERS[sceneName] || SCENE_RENDERERS.title;
+  renderer(sctx, W, H, t);
+}
+
+// Scene animation loop
+function startSceneLoop(name){
+  currentScene = name;
+  sceneTime = 0;
+  if(sceneAnimId) cancelAnimationFrame(sceneAnimId);
+  function loop(ts){
+    sceneTime = ts/1000;
+    renderScene(currentScene, sceneTime);
+    sceneAnimId = requestAnimationFrame(loop);
+  }
+  sceneAnimId = requestAnimationFrame(loop);
+}
+
+/* ============================================================
+   GAME STATE
+   ============================================================ */
+const GS = {
+  step: 'title',       // title | chapter-N | result-N | epilogue
+  chapterIdx: 0,
+  playerChoices: [],   // array of choice indices
+  totalScore: 0,
+};
+
+/* ============================================================
+   SCREEN MANAGEMENT
+   ============================================================ */
+function showScreen(id, delay=0){
+  setTimeout(()=>{
+    document.querySelectorAll('.screen.active').forEach(s=>{
+      s.classList.add('exit');
+      setTimeout(()=>{s.classList.remove('active','exit');},600);
+    });
+    setTimeout(()=>{
+      const el = document.getElementById(id);
+      if(el){el.classList.add('active');}
+    },300);
+  },delay);
+}
+
+function fadeTransition(callback){
+  const fade = document.getElementById('fade-overlay');
+  fade.classList.add('fading');
+  setTimeout(()=>{
+    callback();
+    setTimeout(()=>fade.classList.remove('fading'),300);
+  },500);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+function updateProgress(chapterIdx){
+  const progBar = document.getElementById('progress-bar');
+  const fill    = document.getElementById('prog-fill');
+  const steps   = document.getElementById('prog-steps');
+  
+  progBar.classList.add('visible');
+  fill.style.width = ((chapterIdx)/(CHAPTERS.length))*100+'%';
+  
+  steps.innerHTML = CHAPTERS.map((ch,i)=>`
+    <div class="prog-step">
+      <div class="prog-dot ${i<chapterIdx?'done':''} ${i===chapterIdx?'active':''}"></div>
+      <span class="prog-year">${ch.yearLabel}</span>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   CHAPTER BUILDER
+   ============================================================ */
+function buildChapterScreen(chapter, idx){
+  const div = document.createElement('div');
+  div.className = 'screen ch-screen';
+  div.id = `screen-chapter-${idx}`;
+  div.innerHTML = `
+    <div class="ch-badge">
+      <span class="ch-badge-year">${chapter.year}</span>
+      <span class="ch-badge-ch">Capítulo ${idx+1} / ${CHAPTERS.length}</span>
+    </div>
+    <div class="ch-panel">
+      <h2 class="ch-title">${chapter.title}</h2>
+      <p class="ch-narrative">${chapter.narrative}</p>
+      <p class="ch-question">${chapter.question}</p>
+      <div class="choices">
+        ${chapter.choices.map((c,ci)=>`
+          <button class="choice-btn" data-chapter="${idx}" data-choice="${ci}" id="choice-${idx}-${ci}">
+            <span class="choice-letter">${String.fromCharCode(65+ci)}</span>
+            <span class="choice-text">${c.text}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function buildResultScreen(chapter, idx){
+  const div = document.createElement('div');
+  div.className = 'screen result-screen';
+  div.id = `screen-result-${idx}`;
+  div.innerHTML = `
+    <div class="result-panel">
+      <div class="result-your" id="result-your-${idx}">
+        <div class="result-your-label">Tu decisión</div>
+        <div class="result-your-text" id="result-your-text-${idx}">—</div>
+        <span class="result-your-badge" id="result-badge-${idx}"></span>
+      </div>
+      <div class="result-divider"></div>
+      <div class="result-real">
+        <div class="result-real-header">
+          <span class="result-real-icon">📰</span>
+          <span class="result-real-label">Lo que realmente ocurrió</span>
+        </div>
+        <h3 class="result-real-title">${chapter.realTitle}</h3>
+        <p class="result-real-text">${chapter.realText}</p>
+        <div class="result-fact">📌 ${chapter.realFact}</div>
+      </div>
+      <div class="result-stats">
+        ${chapter.stats.map(s=>`
+          <div class="result-stat">
+            <div class="rs-icon">${s.icon}</div>
+            <div class="rs-value">${s.value}</div>
+            <div class="rs-label">${s.label}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="result-next">
+        <button class="btn-next" data-next-chapter="${idx+1}">
+          ${idx+1 < CHAPTERS.length ? 'Siguiente capítulo →' : 'Ver resultados →'}
+        </button>
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+/* ============================================================
+   BUILD ALL SCREENS
+   ============================================================ */
+function buildAllScreens(){
+  const container = document.getElementById('chapter-container');
+  container.innerHTML = '';
+  CHAPTERS.forEach((ch,i)=>{
+    container.appendChild(buildChapterScreen(ch,i));
+    container.appendChild(buildResultScreen(ch,i));
+  });
+  // Bind events
+  container.querySelectorAll('.choice-btn').forEach(btn=>{
+    btn.addEventListener('click', handleChoiceClick);
+  });
+  container.querySelectorAll('.btn-next').forEach(btn=>{
+    btn.addEventListener('click', handleNextChapter);
+  });
+}
+
+/* ============================================================
+   CHOICE HANDLING
+   ============================================================ */
+function handleChoiceClick(e){
+  const btn = e.currentTarget;
+  const chIdx  = parseInt(btn.dataset.chapter);
+  const chIdx2 = parseInt(btn.dataset.choice);
+  const chapter = CHAPTERS[chIdx];
+  const choice  = chapter.choices[chIdx2];
+
+  // Record choice
+  GS.playerChoices[chIdx] = chIdx2;
+  GS.totalScore += choice.score;
+
+  // Highlight selected
+  document.querySelectorAll(`[data-chapter="${chIdx}"]`).forEach(b=>{
+    b.disabled = true;
+    b.style.opacity='.5';
+    b.style.transform='none';
+    b.style.cursor='default';
+  });
+  btn.classList.add('selected');
+  btn.style.opacity='1';
+
+  // Mark real and expert
+  chapter.choices.forEach((c,ci)=>{
+    const b = document.getElementById(`choice-${chIdx}-${ci}`);
+    if(!b)return;
+    if(c.isReal)    { b.classList.add('real');   }
+    if(c.isExpert)  { b.classList.add('expert'); }
+  });
+
+  // Populate result screen
+  const yourTextEl = document.getElementById(`result-your-text-${chIdx}`);
+  const yourBadge  = document.getElementById(`result-badge-${chIdx}`);
+  if(yourTextEl){
+    yourTextEl.textContent = `"${choice.text}" — ${choice.consequence}`;
+  }
+  if(yourBadge){
+    let badgeClass='badge-neutral', badgeText='';
+    if(choice.isExpert){ badgeClass='badge-good'; badgeText='✅ Opción recomendada por expertos'; }
+    else if(choice.isReal){ badgeClass='badge-real'; badgeText='📰 Esto fue lo que realmente ocurrió'; }
+    else { badgeText='💡 Alternativa posible'; }
+    yourBadge.className='result-your-badge '+badgeClass;
+    yourBadge.textContent=badgeText;
+  }
+
+  // Transition to result
+  setTimeout(()=>{
+    fadeTransition(()=>{
+      showScreen(`screen-result-${chIdx}`);
+    });
+  }, 800);
+}
+
+function handleNextChapter(e){
+  const nextIdx = parseInt(e.currentTarget.dataset.nextChapter);
+  
+  if(nextIdx >= CHAPTERS.length){
+    // Go to epilogue
+    fadeTransition(()=>{
+      buildEpilogue();
+      startSceneLoop('late');
+      showScreen('screen-epilogue');
+      document.getElementById('progress-bar').classList.remove('visible');
+    });
+    return;
+  }
+
+  fadeTransition(()=>{
+    updateProgress(nextIdx);
+    startSceneLoop(CHAPTERS[nextIdx].scene);
+    showScreen(`screen-chapter-${nextIdx}`);
+  });
+}
+
+/* ============================================================
+   EPILOGUE
+   ============================================================ */
+function buildEpilogue(){
+  const scoreEl    = document.getElementById('epi-score-n');
+  const profileEl  = document.getElementById('epi-profile');
+  const profileDesc= document.getElementById('epi-profile-desc');
+  const starsEl    = document.getElementById('epi-stars');
+  const yourChoicesEl = document.getElementById('ecc-your-choices');
+  const realChoicesEl = document.getElementById('ecc-real-choices');
+
+  if(scoreEl) scoreEl.textContent = GS.totalScore;
+
+  // Stars (0-5 based on score 0-15)
+  const starCount = Math.round((GS.totalScore/15)*5);
+  if(starsEl){
+    starsEl.querySelectorAll('.star').forEach((s,i)=>{
+      if(i<starCount){
+        setTimeout(()=>s.classList.add('lit'), i*200+400);
+      }
+    });
+  }
+
+  // Profile
+  const profile = PROFILES.find(p=>GS.totalScore>=p.min) || PROFILES[PROFILES.length-1];
+  if(profileEl)  profileEl.textContent  = profile.title;
+  if(profileDesc)profileDesc.textContent= profile.desc;
+
+  // Comparison
+  if(yourChoicesEl){
+    yourChoicesEl.innerHTML = CHAPTERS.map((ch,i)=>{
+      const ci = GS.playerChoices[i] ?? -1;
+      const c  = ch.choices[ci];
+      const badge = c ? (c.isExpert?'✅':c.isReal?'📰':'💡') : '—';
+      return `<div class="ecc-item"><strong>${ch.year}:</strong> ${badge} ${c?.text||'—'}</div>`;
+    }).join('');
+  }
+  if(realChoicesEl){
+    realChoicesEl.innerHTML = CHAPTERS.map((ch)=>{
+      const c = ch.choices[ch.realChoiceIndex];
+      return `<div class="ecc-item"><strong>${ch.year}:</strong> 📰 ${c.text}</div>`;
+    }).join('');
+  }
+}
+
+/* ============================================================
+   SHARE
+   ============================================================ */
+function shareGame(){
+  const profile = PROFILES.find(p=>GS.totalScore>=p.min)||PROFILES[PROFILES.length-1];
+  const text = `Jugué CASTORES: El costo de una decisión y obtuve ${GS.totalScore}/15 puntos. Mi perfil: "${profile.title}". ¿Qué decisiones tomarías tú? #Newsgame #TierraDelFuego`;
+  if(navigator.share){
+    navigator.share({title:'CASTORES — Newsgame',text,url:location.href}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text+'\n'+location.href).then(()=>alert('¡Copiado al portapapeles!')).catch(()=>alert(text));
+  }
+}
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+let AC=null, masterGain=null;
+function initAudio(){
+  if(AC)return;
+  try{
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+    masterGain=AC.createGain(); masterGain.gain.value=.35; masterGain.connect(AC.destination);
+    playAmbient();
+  }catch(e){}
+}
+function playAmbient(){
+  if(!AC)return;
+  // Soft wind
+  const b=AC.createBuffer(1,AC.sampleRate*6,AC.sampleRate);
+  const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const s=AC.createBufferSource(), f=AC.createBiquadFilter(), g=AC.createGain();
+  s.buffer=b; s.loop=true; f.type='lowpass'; f.frequency.value=180; g.gain.value=.025;
+  s.connect(f); f.connect(g); g.connect(masterGain); s.start();
+  // Slow music
+  playMusicNote();
+}
+function playMusicNote(){
+  if(!AC)return;
+  [[174.61,220,261.63],[130.81,164.81,196],[196,246.94,293.66]][Math.floor(Math.random()*3)].forEach(fr=>{
+    const o=AC.createOscillator(),g=AC.createGain(),now=AC.currentTime;
+    o.type='triangle'; o.frequency.value=fr;
+    g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(.018,now+1.2);
+    g.gain.setValueAtTime(.018,now+4); g.gain.linearRampToValueAtTime(0,now+6);
+    o.connect(g); g.connect(masterGain); o.start(now); o.stop(now+6.5);
+  });
+  setTimeout(playMusicNote, 6000+Math.random()*3000);
+}
+function playClick(){
+  if(!AC)return;
+  const o=AC.createOscillator(),g=AC.createGain(),now=AC.currentTime;
+  o.type='sine'; o.frequency.setValueAtTime(880,now); o.frequency.exponentialRampToValueAtTime(440,now+.1);
+  g.gain.setValueAtTime(.06,now); g.gain.exponentialRampToValueAtTime(.001,now+.18);
+  o.connect(g); g.connect(masterGain); o.start(now); o.stop(now+.2);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildAllScreens();
+  startSceneLoop('title');
+
+  document.getElementById('btn-title-start').addEventListener('click',()=>{
+    initAudio();
+    playClick();
+    GS.playerChoices=[];
+    GS.totalScore=0;
+    GS.chapterIdx=0;
+    fadeTransition(()=>{
+      updateProgress(0);
+      startSceneLoop(CHAPTERS[0].scene);
+      showScreen('screen-chapter-0');
+    });
+  });
+
+  document.getElementById('btn-play-again').addEventListener('click',()=>{
+    GS.playerChoices=[];
+    GS.totalScore=0;
+    GS.chapterIdx=0;
+    buildAllScreens();
+    fadeTransition(()=>{
+      document.getElementById('progress-bar').classList.remove('visible');
+      startSceneLoop('title');
+      showScreen('screen-title');
+    });
+  });
+});
+
+// Try to load external scene images (will be used when available)
+function tryLoadSceneImages(){
+  const imgFiles = {
+    'scene_1946_pristine': 'assets/scene_1946.png',
+    'scene_early':         'assets/scene_1960.png',
+    'scene_ghost_forest':  'assets/scene_1975.png',
+    'scene_crisis_1990':   'assets/scene_1990.png',
+    'scene_2026':          'assets/scene_2026.png',
+  };
+  Object.entries(imgFiles).forEach(([key,src])=>{
+    const img=new Image();
+    img.onload=()=>{ SCENE_IMGS[key]=img; };
+    img.src=src;
+  });
+}
+tryLoadSceneImages();
+</script>
+</body>
+</html>
