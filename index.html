@@ -392,12 +392,12 @@ const CHAPTERS = [
       {
         text: "Introducir 20 castores sin ningún estudio previo",
         isReal: true, isExpert: false, score: 1,
-        consequence: "Sin estudios previos, nadie advirtió sobre la ausencia de depredadores naturales ni sobre la fragilidad del bosque nativo de la isla."
+        consequence: "Sin estudios previos, nadie advirtió sobre la ausencia de depredadores naturales (como los osos o lobos de Canadá) ni sobre la fragilidad del bosque nativo."
       },
       {
         text: "Exigir un estudio de impacto ambiental antes de cualquier acción",
         isReal: false, isExpert: true, score: 3,
-        consequence: "Un estudio habría advertido que los castores no tienen depredadores naturales en el hemisferio sur y que el bosque nativo sería vulnerable a las inundaciones."
+        consequence: "Un estudio habría advertido que los castores carecen de depredadores naturales en el hemisferio sur y que el bosque nativo sería extremadamente vulnerable a las inundaciones."
       },
       {
         text: "Buscar alternativas económicas que no alteren el ecosistema",
@@ -407,12 +407,12 @@ const CHAPTERS = [
     ],
     realChoiceIndex: 0,
     realTitle: "Lo que realmente ocurrió",
-    realText: "En 1946, veinte castores provenientes de Canadá fueron introducidos en la Isla Grande de Tierra del Fuego con el objetivo de impulsar una industria peletera. La iniciativa no estuvo respaldada por ningún estudio ecológico previo.",
-    realFact: "La industria peletera que justificó la introducción nunca prosperó, pero las consecuencias ambientales fueron irreversibles.",
+    realText: "En 1946, veinte castores provenientes de Canadá fueron introducidos en la Isla Grande de Tierra del Fuego con el objetivo de impulsar una industria peletera silvestre. La iniciativa no estuvo respaldada por ningún estudio ecológico previo.",
+    realFact: "La industria peletera que justificó la introducción nunca prosperó, pero la capacidad de adaptación de la especie permitió que 20 ejemplares superaran los 100.000 animales en 50 años.",
     stats: [
-      {icon:"🦸", value:"20", label:"Castores introducidos"},
+      {icon:"🦸", value:"20", label:"Castores introducidos en 1946"},
       {icon:"📋", value:"0", label:"Estudios ecológicos previos"},
-      {icon:"📅", value:"1946", label:"Año de la decisión"}
+      {icon:"📈", value:"+100.000", label:"Castores en 50 años"}
     ]
   },
   {
@@ -421,32 +421,32 @@ const CHAPTERS = [
     yearLabel: "1960s",
     title: "La Primera Advertencia",
     scene: 'early',
-    narrative: "Han pasado casi dos décadas. Investigadores advierten que la población de castores creció considerablemente a partir de los 20 ejemplares originales. La ausencia de depredadores favorecía su reproducción sin control. Los primeros bosques muestran signos de daño.",
+    narrative: "Han pasado casi dos décadas. Investigadores advierten que la población de castores creció considerablemente a partir de los 20 ejemplares originales. Sin depredadores naturales y con abundantes recursos, colonizaron arroyos y ríos. Los primeros bosques muestran signos de daño.",
     question: "¿Cuál debería ser la respuesta del gobierno?",
     choices: [
       {
         text: "Implementar un programa de caza y control inmediato",
         isReal: false, isExpert: true, score: 3,
-        consequence: "Una intervención temprana habría mantenido la población bajo control antes de que el daño se volviera irreversible."
+        consequence: "Una intervención temprana habría mantenido la población bajo control antes de que alcanzara el 95% de las cuencas hidrográficas."
       },
       {
         text: "Seguir monitoreando por más años antes de actuar",
         isReal: true, isExpert: false, score: 1,
-        consequence: "El gobierno eligió esperar. Para cuando actuó, la situación era mucho más difícil y costosa de controlar."
+        consequence: "El gobierno eligió esperar. Para cuando actuó, la especie había ocupado casi la totalidad de la Isla Grande de Tierra del Fuego."
       },
       {
         text: "Abrir la caza comercial libre para que el mercado regule la población",
         isReal: false, isExpert: false, score: 1,
-        consequence: "La caza comercial desregulada generalmente no es suficiente para controlar una especie invasora ya establecida."
+        consequence: "La caza comercial desregulada fue insuficiente para controlar una especie invasora ya establecida en cuencas complejas."
       }
     ],
     realChoiceIndex: 1,
     realTitle: "Lo que realmente ocurrió",
-    realText: "La respuesta fue insuficiente y tardía. Los castores se reprodujeron sin restricciones durante décadas. La población aumentó considerablemente y ocupó gran parte de las cuencas hidrográficas de la Isla Grande de Tierra del Fuego.",
-    realFact: "La falta de acción temprana es hoy considerada por biólogos como el error más costoso del manejo de la especie.",
+    realText: "La respuesta fue insuficiente y tardía. El castor colonizó el 95% de las cuencas de Tierra del Fuego, alterando el flujo del agua y destruyendo bosques de protección en las riberas.",
+    realFact: "La falta de acción temprana permitió que los castores afectaran el 4% del bosque nativo (30.000 hectáreas, equivalente a dos veces la Ciudad de Buenos Aires).",
     stats: [
-      {icon:"🦸", value:"Miles", label:"De castores para los años '70"},
-      {icon:"🌲", value:"Creciente", label:"Daño al bosque nativo"},
+      {icon:"🌊", value:"95%", label:"De las cuencas colonizadas"},
+      {icon:"🌲", value:"30.000 ha", label:"De bosque nativo afectado"},
       {icon:"⏰", value:"Décadas", label:"De acción insuficiente"}
     ]
   },
@@ -456,33 +456,33 @@ const CHAPTERS = [
     yearLabel: "1976",
     title: "Los Bosques Fantasma",
     scene: 'ghost',
-    narrative: "Los científicos documentan un fenómeno grave: 'bosques fantasma'. Árboles de lenga y guindo muertos de pie en el agua represada por los diques de castores. Estas especies nativas no están adaptadas a permanecer bajo el agua durante largos períodos.",
+    narrative: "Los científicos documentan un fenómeno grave: 'bosques fantasma'. Árboles de lenga, guindo y ñire muertos de pie en el agua represada por los diques. Las especies nativas como la lenga (Nothofagus pumilio) no están adaptadas a inundaciones prolongadas y tardan hasta 200 años en recuperarse.",
     question: "¿Cuál es la respuesta adecuada?",
     choices: [
       {
         text: "Declarar emergencia ambiental y solicitar ayuda internacional",
         isReal: false, isExpert: true, score: 3,
-        consequence: "Una declaración de emergencia con ayuda internacional habría acelerado la respuesta y conseguido recursos suficientes para el control."
+        consequence: "Una declaración de emergencia con ayuda internacional habría acelerado la respuesta y conseguido recursos para la restauración."
       },
       {
         text: "Crear un plan de manejo con caza limitada financiada por el estado",
         isReal: true, isExpert: false, score: 1,
-        consequence: "Los programas de caza fueron insuficientes. La demanda de pieles cayó y el incentivo económico desapareció con ella."
+        consequence: "Los programas de caza fueron insuficientes frente a un impacto que superaba en superficie a la actividad forestal de toda la historia europea en la isla."
       },
       {
         text: "Reintroducir depredadores naturales como el puma",
         isReal: false, isExpert: false, score: 2,
-        consequence: "Reintroducir depredadores en una isla tiene sus propios riesgos ecológicos y logísticos complejos."
+        consequence: "Reintroducir grandes depredadores en una isla tiene sus propios riesgos ecológicos y logísticos complejos."
       }
     ],
     realChoiceIndex: 1,
     realTitle: "Lo que realmente ocurrió",
-    realText: "Argentina y Chile implementaron programas de control y monitoreo para reducir el impacto. Sin embargo, la magnitud del problema representó un desafío a largo plazo. Los diques modificaron el flujo del agua y transformaron el paisaje de forma permanente.",
-    realFact: "Los bosques fantasma de Tierra del Fuego son visibles desde el aire: árboles grises muertos parados en agua oscura acumulada por los diques.",
+    realText: "Argentina y Chile enfrentaron la destrucción irreversible de bosques de protección riereña. Especies autóctonas como la lenga demoran hasta 200 años en recuperarse de las inundaciones provocadas por diques.",
+    realFact: "Según estudios satelitales (Biological Invasions), la superficie destruida por el castor en Tierra del Fuego supera a la afectada por el uso forestal desde la llegada de la colonización europea.",
     stats: [
-      {icon:"🌲", value:"Lenga", label:"y guindo: especies afectadas"},
-      {icon:"💧", value:"Diques", label:"Modifican el flujo del agua"},
-      {icon:"📉", value:"Décadas", label:"Para recuperar el bosque"}
+      {icon:"🌲", value:"200 años", label:"Para recuperar la lenga"},
+      {icon:"🪵", value:"Lenga/Ñire", label:"Especies nativas afectadas"},
+      {icon:"📉", value:"30.000 ha", label:"Bosques fantasma creados"}
     ]
   },
   {
@@ -491,33 +491,33 @@ const CHAPTERS = [
     yearLabel: "1991",
     title: "Sin Fronteras",
     scene: 'crisis',
-    narrative: "Los castores cruzaron el Canal de Beagle hacia Chile. Un ecosistema que nunca los conoció ahora los enfrenta sin plan de contingencia. Chile no tiene legislación ni programa para enfrentar la invasión.",
+    narrative: "Los castores cruzaron los islotes del Canal Beagle y alcanzaron el territorio continental chileno tras cruzar el Estrecho de Magallanes. Un ecosistema que nunca los conoció enfrenta el riesgo de que la invasión avance hacia el norte por la Cordillera Patagónica hasta Neuquén.",
     question: "¿Qué propones hacer?",
     choices: [
       {
-        text: "Proponer un acuerdo binacional urgente de erradicación total",
+        text: "Proponer un acuerdo binacional urgente de erradicación y restauración",
         isReal: false, isExpert: true, score: 3,
-        consequence: "Una respuesta coordinada inmediata hubiera evitado que la invasión se consolidara en territorio chileno, donde hoy hay más de 20.000 castores."
+        consequence: "Una respuesta binacional inmediata hubiera evitado la dispersión continental hacia Chile y el riesgo sobre Neuquén y la Patagonia norte."
       },
       {
         text: "Que cada país maneje el problema de forma independiente",
         isReal: true, isExpert: false, score: 1,
-        consequence: "Actuar por separado implicó duplicar esfuerzos, gastar el doble de recursos y lograr la mitad del resultado. Los castores cruzaban la frontera de todos modos."
+        consequence: "Actuar por separado duplicó esfuerzos. Los castores cruzaron fronteras marítimas e insulares de todos modos."
       },
       {
         text: "Crear una zona de libre circulación y estudiar el comportamiento",
         isReal: false, isExpert: false, score: 0,
-        consequence: "Más observación sin acción solo habría agravado el problema y dado a los castores más tiempo para asentarse."
+        consequence: "La inacción permitió que la especie cruzara el Estrecho de Magallanes y amenazara toda la región patagónica."
       }
     ],
     realChoiceIndex: 1,
     realTitle: "Lo que realmente ocurrió",
-    realText: "Argentina y Chile actuaron por separado durante años. Sin coordinación, los esfuerzos fueron ineficientes. Chile tardó en reconocer la magnitud del problema y en crear una legislación específica para tratar la especie como invasora.",
-    realFact: "Hoy se estima que hay más de 20.000 castores en territorio chileno, principalmente en la Región de Magallanes.",
+    realText: "Sin coordinación inicial, la especie avanzó sin freno. Cruzó el Canal Beagle y el Estrecho de Magallanes, consolidándose en territorio chileno y amenazando la Patagonia continental argentina.",
+    realFact: "Se estima que la pérdida económica anual por el daño ambiental del castor en Tierra del Fuego (Argentina) asciende a USD 66.556.975 por año.",
     stats: [
-      {icon:"📋", value:"2008", label:"Año del acuerdo binacional"},
-      {icon:"🦫", value:"+20.000", label:"Castores en Chile"},
-      {icon:"🌊", value:"Canal Beagle", label:"Frontera cruzada"}
+      {icon:"🌊", value:"Canal Beagle", label:"y Estrecho de Magallanes cruzados"},
+      {icon:"💸", value:"USD 66,5M", label:"Pérdida económica anual"},
+      {icon:"🏔️", value:"Neuquén", label:"Límite potencial de invasión"}
     ]
   },
   {
@@ -526,33 +526,33 @@ const CHAPTERS = [
     yearLabel: "2026",
     title: "El Desafío Actual",
     scene: 'late',
-    narrative: "Argentina y Chile impulsan programas de control y monitoreo para restaurar las áreas afectadas. Entre las medidas aplicadas se encuentran la captura de ejemplares en zonas prioritarias y proyectos de recuperación ambiental. Pero la magnitud del problema es inmensa.",
+    narrative: "Argentina y Chile ejecutan un Acuerdo Binacional y el Proyecto ENEEI (Especies Exóticas Invasoras), incluyendo 8 áreas piloto de remoción intensiva en Tierra del Fuego para restaurar los bosques nativos. Sin embargo, con pérdidas de USD 66.5M anuales, el desafío requiere un compromiso a muy largo plazo.",
     question: "¿Cuál debe ser el enfoque principal?",
     choices: [
       {
-        text: "Erradicación total de los castores con financiamiento internacional",
-        isReal: false, isExpert: true, score: 3,
-        consequence: "Una erradicación total con recursos adecuados sería la única forma de permitir la recuperación plena del bosque nativo."
+        text: "Erradicación y restauración intensiva en áreas piloto prioritarias",
+        isReal: true, isExpert: true, score: 3,
+        consequence: "Las áreas piloto demostraron que la remoción intensiva con técnicas humanitarias permite liberar ambientes y recuperar los cursos de agua."
       },
       {
-        text: "Programas de control y monitoreo sin meta de erradicación",
-        isReal: true, isExpert: false, score: 1,
-        consequence: "Los programas de control reducen el impacto pero no resuelven el problema de fondo. La recuperación del bosque puede tomar varias décadas."
+        text: "Monitoreo pasivo y contención sin remoción activa",
+        isReal: false, isExpert: false, score: 1,
+        consequence: "Sin remoción activa en áreas prioritarias, la masa forestal nativa continuaría degradándose aceleradamente."
       },
       {
         text: "Declarar los castores patrimonio natural e integrarlos al ecosistema",
         isReal: false, isExpert: false, score: 0,
-        consequence: "Los castores no son parte del ecosistema patagónico. Su aceptación como 'nativos' profundizaría el daño sobre las especies endémicas."
+        consequence: "El castor es una especie exótica invasora de uso restringido (Categoría 1); integrarlo profundizaría el daño irreparable sobre las lengas y turberas."
       }
     ],
-    realChoiceIndex: 1,
+    realChoiceIndex: 0,
     realTitle: "Lo que realmente ocurre hoy",
-    realText: "Argentina y Chile han impulsado programas de control y monitoreo. Sin embargo, la magnitud del problema representa un desafío a largo plazo. La recuperación de los bosques afectados puede requerir varias décadas debido al lento crecimiento de las especies nativas.",
-    realFact: "El caso demuestra cómo la introducción de una especie fuera de su hábitat puede generar consecuencias inesperadas y refuerza la importancia de evaluar riesgos ambientales antes de actuar.",
+    realText: "Argentina implementa el Acuerdo Binacional con Chile y el Proyecto ENEEI, con 8 áreas piloto de remoción de castores en Tierra del Fuego para liberar ecosistemas y recuperar el bosque de lengas.",
+    realFact: "El proyecto busca evitar que el castor avance hacia la Patagonia continental y recuperar áreas donde la lenga tarda 200 años en regenerarse.",
     stats: [
-      {icon:"🌱", value:"Decenas de miles", label:"Castores estimados hoy"},
-      {icon:"🌲", value:"Décadas", label:"Para recuperar el bosque"},
-      {icon:"📢", value:"Hoy", label:"Aún sin solución completa"}
+      {icon:"🇦🇷🇨🇱", value:"Acuerdo Binacional", label:"Argentina — Chile"},
+      {icon:"📍", value:"8 Áreas Piloto", label:"De remoción en Tierra del Fuego"},
+      {icon:"🌲", value:"200 años", label:"De regeneración del bosque"}
     ]
   }
 ];
