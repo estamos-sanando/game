@@ -1107,20 +1107,12 @@ function handleChoiceClick(e){
   // Highlight selected
   document.querySelectorAll(`[data-chapter="${chIdx}"]`).forEach(b=>{
     b.disabled = true;
-    b.style.opacity='.5';
+    b.style.opacity='.4';
     b.style.transform='none';
     b.style.cursor='default';
   });
   btn.classList.add('selected');
   btn.style.opacity='1';
-
-  // Mark real and expert
-  chapter.choices.forEach((c,ci)=>{
-    const b = document.getElementById(`choice-${chIdx}-${ci}`);
-    if(!b)return;
-    if(c.isReal)    { b.classList.add('real');   }
-    if(c.isExpert)  { b.classList.add('expert'); }
-  });
 
   // Populate result screen
   const yourTextEl = document.getElementById(`result-your-text-${chIdx}`);
