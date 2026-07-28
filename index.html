@@ -163,41 +163,47 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
 /* ======================================================
    RESULT SCREENS
    ====================================================== */
-.result-panel{display:flex;flex-direction:column;gap:16px;max-height:60vh}
+.result-panel{display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 90px);padding:22px 28px}
+.result-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:14px;align-items:stretch}
+
 .result-your{background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.35);
-  border-radius:12px;padding:16px 20px}
-.result-your-label{font-family:var(--ff-ui);font-size:.68rem;color:var(--gold);
+  border-radius:14px;padding:14px 18px;display:flex;flex-direction:column}
+.result-your-label{font-family:var(--ff-ui);font-size:.68rem;color:var(--gold-l);
   text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:6px}
-.result-your-text{font-size:.95rem;color:var(--cream);line-height:1.55}
+.result-your-text{font-size:.88rem;color:var(--cream);line-height:1.5;flex:1}
 .result-your-badge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;
-  font-family:var(--ff-ui);font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:50px}
+  font-family:var(--ff-ui);font-size:.7rem;font-weight:700;padding:4px 12px;border-radius:50px;align-self:flex-start}
 .badge-good{background:rgba(46,125,50,.35);color:#A5D6A7;border:1px solid rgba(102,187,106,.45)}
 .badge-real{background:rgba(139,26,26,.35);color:#EF9A9A;border:1px solid rgba(239,83,80,.4)}
 .badge-neutral{background:rgba(201,162,39,.2);color:var(--gold-l);border:1px solid rgba(201,162,39,.35)}
 
-.result-real{border:1px solid rgba(239,83,80,.3);border-radius:12px;padding:16px 20px;
-  background:rgba(16,18,12,.7)}
-.result-real-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.result-real-icon{font-size:1.1rem}
-.result-real-label{font-family:var(--ff-ui);font-size:.68rem;color:var(--cream-d);text-transform:uppercase;letter-spacing:.08em}
-.result-real-title{font-family:var(--ff-title);font-size:1.1rem;color:#FFF;margin-bottom:8px;font-weight:700}
-.result-real-text{font-size:.9rem;color:var(--cream-m);line-height:1.65}
-.result-fact{background:rgba(201,162,39,.1);border-left:3px solid var(--gold);
-  padding:10px 16px;font-size:.85rem;color:var(--cream-m);font-style:italic;
-  border-radius:0 8px 8px 0;margin-top:10px}
-.result-stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px}
+.result-real{border:1px solid rgba(239,83,80,.3);border-radius:14px;padding:14px 18px;
+  background:rgba(16,18,12,.7);display:flex;flex-direction:column}
+.result-real-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.result-real-icon{font-size:1rem}
+.result-real-label{font-family:var(--ff-ui);font-size:.65rem;color:var(--cream-d);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.result-real-title{font-family:var(--ff-title);font-size:1.05rem;color:#FFF;margin-bottom:6px;font-weight:700}
+.result-real-text{font-size:.86rem;color:var(--cream-m);line-height:1.55}
+.result-fact{background:rgba(201,162,39,.12);border-left:3px solid var(--gold);
+  padding:8px 14px;font-size:.82rem;color:var(--cream-m);font-style:italic;
+  border-radius:0 8px 8px 0;margin-top:8px}
+
+.result-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding-top:10px;border-top:1px solid rgba(201,162,39,.2)}
+.result-stats{display:flex;gap:10px;flex:1}
 .result-stat{background:rgba(20,35,20,.65);border:1px solid rgba(255,255,255,.1);
-  border-radius:10px;padding:12px 16px;flex:1;min-width:110px;text-align:center}
-.rs-icon{font-size:1.3rem;margin-bottom:4px}
-.rs-value{font-family:var(--ff-title);font-size:1.45rem;color:var(--gold-l);font-weight:700;line-height:1}
-.rs-label{font-size:.65rem;color:var(--cream-d);font-family:var(--ff-ui);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
-.result-next{display:flex;justify-content:flex-end;margin-top:6px}
+  border-radius:12px;padding:8px 12px;flex:1;text-align:center}
+.rs-icon{font-size:1.1rem;margin-bottom:2px}
+.rs-value{font-family:var(--ff-title);font-size:1.3rem;color:var(--gold-l);font-weight:700;line-height:1}
+.rs-label{font-size:.6rem;color:var(--cream-d);font-family:var(--ff-ui);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
 .btn-next{display:inline-flex;align-items:center;gap:10px;
   background:linear-gradient(145deg,var(--gold-l),var(--gold-d));
-  color:var(--black);padding:14px 32px;border-radius:50px;border:none;cursor:pointer;
-  font-family:var(--ff-ui);font-size:.9rem;font-weight:700;letter-spacing:.05em;
-  box-shadow:0 4px 20px rgba(201,162,39,.4);transition:all .25s ease;text-transform:uppercase}
-.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,162,39,.55)}
+  color:var(--black);padding:13px 32px;border-radius:50px;border:none;cursor:pointer;
+  font-family:var(--ff-ui);font-size:.88rem;font-weight:700;letter-spacing:.05em;
+  box-shadow:0 6px 24px rgba(201,162,39,.45);transition:all .25s ease;text-transform:uppercase;
+  white-space:nowrap;flex-shrink:0}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,162,39,.6)}
 
 /* ======================================================
    EPILOGUE
@@ -280,8 +286,14 @@ html,body{height:100%;overflow:hidden;background:var(--black);color:var(--cream)
 ::-webkit-scrollbar-track{background:transparent}
 
 @media(max-height:700px){
-  .ch-panel,.result-panel{max-height:60vh;padding:20px 24px}
+  .ch-panel{max-height:62vh;padding:20px 24px}
+  .result-panel{padding:16px 20px}
   .epi-inner{padding:20px}
+}
+@media(max-width:768px){
+  .result-grid{grid-template-columns:1fr}
+  .result-footer{flex-direction:column;align-items:stretch}
+  .btn-next{width:100%;justify-content:center}
 }
 @media(max-width:640px){
   .choices{grid-template-columns:1fr}
@@ -1017,31 +1029,32 @@ function buildResultScreen(chapter, idx){
   div.id = `screen-result-${idx}`;
   div.innerHTML = `
     <div class="result-panel">
-      <div class="result-your" id="result-your-${idx}">
-        <div class="result-your-label">Tu decisión</div>
-        <div class="result-your-text" id="result-your-text-${idx}">—</div>
-        <span class="result-your-badge" id="result-badge-${idx}"></span>
-      </div>
-      <div class="result-divider"></div>
-      <div class="result-real">
-        <div class="result-real-header">
-          <span class="result-real-icon">📰</span>
-          <span class="result-real-label">Lo que realmente ocurrió</span>
+      <div class="result-grid">
+        <div class="result-your" id="result-your-${idx}">
+          <div class="result-your-label">Tu decisión</div>
+          <div class="result-your-text" id="result-your-text-${idx}">—</div>
+          <span class="result-your-badge" id="result-badge-${idx}"></span>
         </div>
-        <h3 class="result-real-title">${chapter.realTitle}</h3>
-        <p class="result-real-text">${chapter.realText}</p>
-        <div class="result-fact">📌 ${chapter.realFact}</div>
-      </div>
-      <div class="result-stats">
-        ${chapter.stats.map(s=>`
-          <div class="result-stat">
-            <div class="rs-icon">${s.icon}</div>
-            <div class="rs-value">${s.value}</div>
-            <div class="rs-label">${s.label}</div>
+        <div class="result-real">
+          <div class="result-real-header">
+            <span class="result-real-icon">📰</span>
+            <span class="result-real-label">Lo que realmente ocurrió</span>
           </div>
-        `).join('')}
+          <h3 class="result-real-title">${chapter.realTitle}</h3>
+          <p class="result-real-text">${chapter.realText}</p>
+          <div class="result-fact">📌 ${chapter.realFact}</div>
+        </div>
       </div>
-      <div class="result-next">
+      <div class="result-footer">
+        <div class="result-stats">
+          ${chapter.stats.map(s=>`
+            <div class="result-stat">
+              <div class="rs-icon">${s.icon}</div>
+              <div class="rs-value">${s.value}</div>
+              <div class="rs-label">${s.label}</div>
+            </div>
+          `).join('')}
+        </div>
         <button class="btn-next" data-next-chapter="${idx+1}">
           ${idx+1 < CHAPTERS.length ? 'Siguiente capítulo →' : 'Ver resultados →'}
         </button>
